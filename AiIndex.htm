@@ -1,0 +1,2018 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iApp Code</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2980b9;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --accent: #e74c3c;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            min-height: 100vh;
+            color: var(--dark);
+            position: relative;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        
+        .logo h1 {
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .search-container {
+            display: flex;
+            align-items: center;
+            width: 50%;
+            position: relative;
+        }
+        
+        .search-bar {
+            display: flex;
+            background: white;
+            border-radius: 30px;
+            padding: 10px 20px 10px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            position: relative;
+        }
+        
+        .search-bar input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 1rem;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            color: var(--secondary);
+            z-index: 1;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 15px;
+            margin-left: 10px;
+            position: relative;
+        }
+        
+        .user-actions i {
+            font-size: 1.5rem;
+            color: var(--dark);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .user-actions i:hover {
+            color: var(--primary);
+        }
+        
+        .categories {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        
+        .category {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+        
+        .category:hover, .category.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .section-title h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .file-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .file-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        
+        .file-icon {
+            height: 120px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .file-icon img {
+            max-width: 100%;
+            max-height: 80px;
+            object-fit: contain;
+        }
+        
+        .file-info {
+            padding: 15px;
+            flex-grow: 1;
+        }
+        
+        .file-info h3 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .file-info p {
+            color: #7f8c8d;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        
+        .file-actions {
+            padding: 0 15px 15px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .download-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .download-btn:hover {
+            background: var(--secondary);
+            transform: scale(1.05);
+        }
+        
+        .upload-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .upload-btn:hover {
+            background-color: var(--secondary);
+            transform: scale(1.1);
+        }
+        
+        .upload-form {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            padding: 20px;
+            width: 300px;
+            z-index: 100;
+            display: none;
+        }
+        
+        .upload-form.active {
+            display: block;
+        }
+        
+        .upload-form h3 {
+            margin-bottom: 15px;
+            text-align: center;
+            color: var(--dark);
+        }
+        
+        .upload-form .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .upload-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .upload-form input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px dashed var(--primary);
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+        
+        .upload-form select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .upload-form .submit-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .upload-form .submit-btn:hover {
+            background: var(--secondary);
+        }
+        
+        .upload-form .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .auth-form {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            padding: 20px;
+            width: 300px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .auth-form h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+            text-align: center;
+        }
+        
+        .auth-form .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .auth-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+        
+        .auth-form input, .auth-form select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .auth-form .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .auth-form .form-actions button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .auth-form .submit-btn {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .auth-form .submit-btn:hover {
+            background: var(--secondary);
+        }
+        
+        .auth-form .switch-btn {
+            background: transparent;
+            color: var(--primary);
+        }
+        
+        .auth-form .switch-btn:hover {
+            text-decoration: underline;
+        }
+        
+        .avatar-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #f5f5f5;
+            margin-bottom: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #ccc;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .avatar-preview:hover {
+            border-color: var(--primary);
+        }
+        
+        .avatar-preview i {
+            font-size: 2.5rem;
+            color: #ccc;
+        }
+        
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        
+        .user-panel {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            padding: 20px;
+            width: 300px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .user-panel img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .user-panel h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        #logout-btn {
+            width: 100%;
+            padding: 8px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        #logout-btn:hover {
+            background: #c0392b;
+            transform: scale(1.02);
+        }
+        
+        .register-form .form-group:nth-child(n+3) {
+            display: none;
+        }
+        
+        .register-form.active .form-group {
+            display: block;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        .file-id-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        .approve-btn {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .approve-btn:hover {
+            background: #27ae60;
+            transform: scale(1.05);
+        }
+        
+        .reject-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .reject-btn:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+        
+        .audit-buttons {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 15px 15px;
+        }
+        
+        .audit-btn-group {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .audit-download-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .audit-download-btn:hover {
+            background: var(--secondary);
+            transform: scale(1.05);
+        }
+        
+        .avatar-edit-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            padding: 20px;
+            width: 300px;
+            z-index: 1001;
+            display: none;
+        }
+        
+        .avatar-edit-panel.active {
+            display: block;
+        }
+        
+        .avatar-edit-panel h3 {
+            margin-bottom: 15px;
+            text-align: center;
+            color: var(--dark);
+        }
+        
+        .avatar-edit-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #f5f5f5;
+            margin: 0 auto 15px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #ccc;
+            cursor: pointer;
+        }
+        
+        .avatar-edit-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        
+        .avatar-edit-preview i {
+            font-size: 3rem;
+            color: #ccc;
+        }
+        
+        .avatar-edit-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .avatar-edit-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .avatar-edit-submit {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .avatar-edit-submit:hover {
+            background: var(--secondary);
+        }
+        
+        .avatar-edit-cancel {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .avatar-edit-cancel:hover {
+            background: #c0392b;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .overlay.active {
+            display: block;
+        }
+        
+        #avatar-edit-input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+        }
+        
+        .profile-edit-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            padding: 20px;
+            width: 300px;
+            z-index: 1001;
+            display: none;
+        }
+        
+        .profile-edit-panel.active {
+            display: block;
+        }
+        
+        .profile-edit-panel h3 {
+            margin-bottom: 15px;
+            text-align: center;
+            color: var(--dark);
+        }
+        
+        .profile-edit-panel .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .profile-edit-panel label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+        
+        .profile-edit-panel input, 
+        .profile-edit-panel select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        /* 当前密码字段的只读样式 */
+        #edit-current-password[readonly] {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+        
+        .profile-edit-panel .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .profile-edit-panel .submit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .profile-edit-panel .submit-btn:hover {
+            background: var(--secondary);
+        }
+        
+        .profile-edit-panel .switch-btn {
+            background: transparent;
+            color: var(--primary);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .profile-edit-panel .switch-btn:hover {
+            text-decoration: underline;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .file-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+            
+            .search-container {
+                width: 70%;
+            }
+            
+            .auth-form, .user-panel {
+                width: 280px;
+                right: -20px;
+            }
+            
+            .upload-form {
+                width: 280px;
+                right: 20px;
+            }
+            
+            .audit-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .audit-btn-group {
+                justify-content: flex-end;
+            }
+            
+            .avatar-edit-panel {
+                width: 280px;
+            }
+            
+            .profile-edit-panel {
+                width: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-code"></i>
+                <h1>iApp Code</h1>
+            </div>
+            <div class="search-container">
+                <div class="search-bar">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="search-input" placeholder="搜索源码文件...">
+                </div>
+                <div class="user-actions">
+                    <i class="fas fa-user-circle" id="user-icon"></i>
+                    <div class="auth-form login-form" id="login-form">
+                        <h3>用户登录</h3>
+                        <form>
+                            <div class="form-group">
+                                <label for="login-username">账号</label>
+                                <input type="text" id="login-username" placeholder="请输入账号">
+                            </div>
+                            <div class="form-group">
+                                <label for="login-password">密码</label>
+                                <input type="password" id="login-password" placeholder="请输入密码">
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="submit-btn">登录</button>
+                                <button type="button" class="switch-btn" id="show-register">注册账号</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="auth-form register-form" id="register-form">
+                        <h3>用户注册</h3>
+                        <form>
+                            <div class="form-group avatar-upload">
+                                <div class="avatar-preview" id="avatar-upload-trigger">
+                                    <i class="fas fa-user" id="avatar-icon"></i>
+                                    <img id="avatar-preview" src="" alt="头像预览">
+                                </div>
+                                <input type="file" id="register-avatar" accept="image/*" style="display: none;">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="register-username">账号</label>
+                                <input type="text" id="register-username" placeholder="请输入账号">
+                            </div>
+                            <div class="form-group">
+                                <label for="register-password">密码</label>
+                                <input type="password" id="register-password" placeholder="请输入密码">
+                            </div>
+                            <div class="form-group">
+                                <label for="register-nickname">昵称</label>
+                                <input type="text" id="register-nickname" placeholder="请输入昵称">
+                            </div>
+                            <div class="form-group">
+                                <label for="register-gender">性别</label>
+                                <select id="register-gender">
+                                    <option value="">请选择性别</option>
+                                    <option value="male">男</option>
+                                    <option value="female">女</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-address">地址</label>
+                                <input type="text" id="register-address" placeholder="请输入地址">
+                            </div>
+                            <div class="form-group">
+                                <label for="register-email">邮箱</label>
+                                <input type="email" id="register-email" placeholder="请输入邮箱">
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="submit-btn">注册</button>
+                                <button type="button" class="switch-btn" id="show-login">已有账号</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="categories">
+            <div class="category active" data-type="v7">v7</div>
+            <div class="category" data-type="v3">v3</div>
+            <div class="category" data-type="v5">v5</div>
+            <div class="category" data-type="v6">v6</div>
+            <div class="category" data-type="iG">iG</div>
+            <div class="category" data-type="audit">审核</div>
+        </div>
+        <div>凡想QQ群：1042640909</div>
+        <section class="files">
+            <div class="section-title">
+                <h2>源码文件</h2>
+            </div>
+            <div class="file-grid" id="file-list">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <div class="upload-form" id="upload-form">
+        <h3>上传源码文件</h3>
+        <form id="file-upload-form">
+            <div class="form-group">
+                <label for="file-upload">选择文件</label>
+                <input type="file" id="file-upload" required>
+            </div>
+            <div class="form-group">
+                <label for="file-type">源码类型</label>
+                <select id="file-type" required>
+                    <option value="">请选择类型</option>
+                    <option value="v7">v7</option>
+                    <option value="v3">v3</option>
+                    <option value="v5">v5</option>
+                    <option value="v6">v6</option>
+                    <option value="iG">iG</option>
+                </select>
+            </div>
+            <button type="submit" class="submit-btn" id="upload-submit-btn">
+                <i class="fas fa-upload"></i> 上传文件
+            </button>
+        </form>
+    </div>
+    
+    <div class="upload-btn" id="upload-btn">
+        <i class="fas fa-plus"></i>
+    </div>
+    
+    <div class="overlay" id="avatar-overlay"></div>
+    <div class="avatar-edit-panel" id="avatar-edit-panel">
+        <h3>修改头像</h3>
+        <div class="avatar-edit-preview" id="avatar-edit-preview">
+            <i class="fas fa-user" id="avatar-edit-icon"></i>
+            <img id="avatar-edit-img" src="" alt="头像预览">
+        </div>
+        <input type="file" id="avatar-edit-input" accept="image/*">
+        <div class="avatar-edit-actions">
+            <button class="avatar-edit-btn avatar-edit-cancel" id="avatar-edit-cancel">取消</button>
+            <button class="avatar-edit-btn avatar-edit-submit" id="avatar-edit-submit">确认修改</button>
+        </div>
+    </div>
+    
+    <div class="profile-edit-panel" id="profile-edit-panel">
+        <h3>编辑资料</h3>
+        <form id="profile-edit-form">
+            <div class="form-group">
+                <label for="edit-nickname">昵称</label>
+                <input type="text" id="edit-nickname" placeholder="请输入昵称" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-gender">性别</label>
+                <select id="edit-gender" required>
+                    <option value="男">男</option>
+                    <option value="女">女</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="edit-address">地址</label>
+                <input type="text" id="edit-address" placeholder="请输入地址">
+            </div>
+            <div class="form-group">
+                <label for="edit-current-password">当前密码</label>
+                <input type="password" id="edit-current-password" placeholder="系统自动填充" readonly>
+            </div>
+            <div class="form-group">
+                <label for="edit-new-password">新密码 (留空则不修改)</label>
+                <input type="password" id="edit-new-password" placeholder="请输入新密码">
+            </div>
+            <div class="form-actions">
+                <button type="button" class="submit-btn" id="save-profile-btn">保存修改</button>
+                <button type="button" class="switch-btn" id="cancel-edit-btn">取消</button>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        // 登录/注册表单切换
+        const userIcon = document.getElementById('user-icon');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const showRegister = document.getElementById('show-register');
+        const showLogin = document.getElementById('show-login');
+        
+        userIcon.addEventListener('click', function(e) {
+            e.stopPropagation();
+            loginForm.classList.toggle('active');
+            registerForm.classList.remove('active');
+            
+            const userPanel = document.querySelector('.user-panel');
+            if (userPanel) {
+                userPanel.style.display = userPanel.style.display === 'block' ? 'none' : 'block';
+            }
+        });
+        
+        showRegister.addEventListener('click', function(e) {
+            e.preventDefault();
+            loginForm.classList.remove('active');
+            registerForm.classList.add('active');
+        });
+        
+        showLogin.addEventListener('click', function(e) {
+            e.preventDefault();
+            registerForm.classList.remove('active');
+            loginForm.classList.add('active');
+        });
+        
+        // 修改全局点击事件监听 - 不再自动隐藏profile-edit-panel
+        document.addEventListener('click', function() {
+            loginForm.classList.remove('active');
+            registerForm.classList.remove('active');
+            
+            const userPanel = document.querySelector('.user-panel');
+            if (userPanel) {
+                userPanel.style.display = 'none';
+            }
+            
+            document.getElementById('avatar-overlay').classList.remove('active');
+            document.getElementById('avatar-edit-panel').classList.remove('active');
+        });
+        
+        loginForm.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+        
+        registerForm.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+        
+        // 头像上传预览功能
+        const avatarTrigger = document.getElementById('avatar-upload-trigger');
+        const avatarInput = document.getElementById('register-avatar');
+        const avatarPreview = document.getElementById('avatar-preview');
+        const avatarIcon = document.getElementById('avatar-icon');
+        
+        avatarTrigger.addEventListener('click', function() {
+            avatarInput.click();
+        });
+        
+        avatarInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    avatarPreview.src = event.target.result;
+                    avatarPreview.style.display = 'block';
+                    avatarIcon.style.display = 'none';
+                }
+                
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // 注册表单提交功能
+        document.querySelector('.register-form .submit-btn').addEventListener('click', function() {
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+            const nickname = document.getElementById('register-nickname').value;
+            const genderSelect = document.getElementById('register-gender');
+            const gender = genderSelect.value;
+            const address = document.getElementById('register-address').value;
+            const email = document.getElementById('register-email').value;
+            const avatarFile = document.getElementById('register-avatar').files[0];
+
+            if (!username || !password || !nickname) {
+                alert('账号、密码和昵称不能为空');
+                return;
+            }
+
+            if (password.length < 6) {
+                alert('密码长度不能少于6位');
+                return;
+            }
+
+            if (gender !== 'male' && gender !== 'female') {
+                alert('请选择性别');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('AN', username);
+            formData.append('PIN', password);
+            formData.append('name', nickname);
+            formData.append('gender', gender === 'male' ? '男' : '女');
+            formData.append('address', address);
+            formData.append('mailbox', email);
+            formData.append('method', '注册');
+            
+            if (avatarFile) {
+                formData.append('form', avatarFile);
+            }
+
+            const submitBtn = document.querySelector('.register-form .submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 注册中...';
+
+            fetch('https://0911.fun/D/test/987/log_on.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(responseText => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> 注册';
+                
+                if (responseText.includes('注册成功')) {
+                    alert('注册成功！');
+                    document.getElementById('register-form').classList.remove('active');
+                    document.getElementById('login-form').classList.add('active');
+                    
+                    document.getElementById('login-username').value = username;
+                    document.getElementById('login-password').value = password;
+                } else {
+                    alert(responseText);
+                }
+            })
+            .catch(error => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> 注册';
+                console.error('注册错误:', error);
+                alert('注册过程中发生错误: ' + error.message);
+            });
+        });
+
+        // 登录表单提交功能
+        document.querySelector('.login-form .submit-btn').addEventListener('click', function() {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!username || !password) {
+                alert('请输入账号和密码');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('AN', username);
+            formData.append('PIN', password);
+            formData.append('method', '登录');
+
+            fetch('https://0911.fun/D/test/987/log_on.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(responseText => {
+                const extractValue = (key, isNumber = false) => {
+                    const keyStr = `"${key}":`;
+                    const startIndex = responseText.indexOf(keyStr);
+                    if (startIndex === -1) return null;
+                    
+                    const valueStart = startIndex + keyStr.length;
+                    let end;
+                    
+                    if (isNumber) {
+                        let commaIndex = responseText.indexOf(',', valueStart);
+                        let braceIndex = responseText.indexOf('}', valueStart);
+                        end = Math.min(
+                            commaIndex !== -1 ? commaIndex : Infinity, 
+                            braceIndex !== -1 ? braceIndex : Infinity
+                        );
+                        if (end === Infinity) return null;
+                    } else {
+                        if (responseText[valueStart] !== '"') return null;
+                        end = responseText.indexOf('"', valueStart + 1);
+                    }
+                    
+                    if (end === -1) return null;
+                    
+                    const value = responseText.substring(valueStart, end).replace(/"/g, '');
+                    return isNumber ? parseInt(value) || 0 : value;
+                };
+
+                const name = extractValue('name');
+                const form = extractValue('form', true);
+                const address = extractValue('address');
+                const gender = extractValue('gender');
+                const mailbox = extractValue('mailbox');
+                const id = extractValue('ID', true);
+
+                if (name && name !== 'null') {
+                    const userData = {
+                        name: name,
+                        avatar: form !== null ? "https://0911.fun/D/test/987/uploadt/" + form + ".jpg" : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+                        address: address || '未设置',
+                        gender: gender || '未设置',
+                        mailbox: mailbox || '未设置',
+                        username: username,
+                        password: password,
+                        id: id || 0
+                    };
+                    
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    
+                    const expiryDate = new Date();
+                    expiryDate.setDate(expiryDate.getDate() + 7);
+                    document.cookie = `username=${username}; expires=${expiryDate.toUTCString()}; path=/`;
+                    document.cookie = `password=${password}; expires=${expiryDate.toUTCString()}; path=/`;
+                    document.cookie = `userid=${id}; expires=${expiryDate.toUTCString()}; path=/`;
+                    
+                    updateUserIcon(userData, false);
+                    
+                    document.getElementById('login-form').classList.remove('active');
+                    
+                    alert('登录成功！');
+                } else {
+                    alert('登录失败，请检查账号密码');
+                }
+            })
+            .catch(error => {
+                console.error('登录错误:', error);
+                alert('登录过程中发生错误');
+            });
+        });
+
+        // 更新用户图标显示
+        function updateUserIcon(userData, showAvatar = false) {
+            const userIcon = document.getElementById('user-icon');
+            
+            userIcon.className = 'fas fa-user-circle';
+            userIcon.innerHTML = '';
+            
+            let userPanel = document.querySelector('.user-panel');
+            if (userPanel) {
+                userPanel.remove();
+            }
+            
+            userPanel = document.createElement('div');
+            userPanel.className = 'user-panel';
+            
+            userPanel.innerHTML = `
+                <div style="text-align:center;margin-bottom:15px;">
+                    <img src="${userData.avatar || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}" 
+                         alt="用户头像" id="user-avatar-img"
+                         style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:10px;cursor:pointer;">
+                    <h3>${userData.name}</h3>
+                </div>
+                <div style="margin-bottom:10px;"><strong>账号:</strong> ${userData.username}</div>
+                <div style="margin-bottom:10px;"><strong>性别:</strong> <span id="user-gender">${userData.gender}</span></div>
+                <div style="margin-bottom:10px;"><strong>地址:</strong> <span id="user-address">${userData.address}</span></div>
+                <div style="margin-bottom:10px;"><strong>邮箱:</strong> ${userData.mailbox}</div>
+                <button id="edit-profile-btn" style="width:100%;padding:8px;background:var(--primary);color:white;border:none;border-radius:5px;cursor:pointer;margin-bottom:10px;">
+                    编辑资料
+                </button>
+                <button id="logout-btn" style="width:100%;padding:8px;background:#e74c3c;color:white;border:none;border-radius:5px;cursor:pointer;">
+                    退出登录
+                </button>
+            `;
+            
+            document.querySelector('.user-actions').appendChild(userPanel);
+            
+            const logoutBtn = userPanel.querySelector('#logout-btn');
+            logoutBtn.addEventListener('click', function() {
+                localStorage.removeItem('userData');
+                document.cookie = 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                document.cookie = 'password=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                document.cookie = 'userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                location.reload();
+            });
+            
+            const avatarImg = userPanel.querySelector('#user-avatar-img');
+            avatarImg.addEventListener('click', function(e) {
+                e.stopPropagation();
+                showAvatarEditPanel();
+            });
+            
+            const editProfileBtn = userPanel.querySelector('#edit-profile-btn');
+            editProfileBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                showProfileEditPanel(userData);
+            });
+            
+            document.addEventListener('click', function() {
+                if (userPanel) {
+                    userPanel.style.display = 'none';
+                }
+            });
+            
+            userPanel.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            userPanel.style.display = 'none';
+        }
+
+        // 头像修改面板功能
+        const avatarEditPreview = document.getElementById('avatar-edit-preview');
+        const avatarEditInput = document.getElementById('avatar-edit-input');
+        const avatarEditImg = document.getElementById('avatar-edit-img');
+        const avatarEditIcon = document.getElementById('avatar-edit-icon');
+        const avatarEditCancel = document.getElementById('avatar-edit-cancel');
+        const avatarEditSubmit = document.getElementById('avatar-edit-submit');
+        const avatarOverlay = document.getElementById('avatar-overlay');
+        const avatarEditPanel = document.getElementById('avatar-edit-panel');
+
+        function showAvatarEditPanel() {
+            avatarOverlay.classList.add('active');
+            avatarEditPanel.classList.add('active');
+            
+            avatarEditIcon.style.display = 'block';
+            avatarEditImg.style.display = 'none';
+            avatarEditImg.src = '';
+            avatarEditInput.value = '';
+        }
+
+        function hideAvatarEditPanel() {
+            avatarOverlay.classList.remove('active');
+            avatarEditPanel.classList.remove('active');
+        }
+
+        avatarOverlay.addEventListener('click', function(e) {
+            // 确保点击的是遮罩层本身而不是子元素
+            if (e.target === this) {
+                hideAvatarEditPanel();
+                hideProfileEditPanel();
+            }
+        });
+
+        avatarEditPreview.addEventListener('click', function() {
+            avatarEditInput.click();
+        });
+
+        avatarEditInput.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        avatarEditInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    avatarEditImg.src = event.target.result;
+                    avatarEditImg.style.display = 'block';
+                    avatarEditIcon.style.display = 'none';
+                }
+                
+                reader.readAsDataURL(file);
+            }
+        });
+
+        avatarEditCancel.addEventListener('click', function(e) {
+            e.stopPropagation();
+            hideAvatarEditPanel();
+        });
+
+        avatarEditPanel.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        avatarEditSubmit.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            const file = avatarEditInput.files[0];
+            if (!file) {
+                alert('请选择要上传的头像');
+                return;
+            }
+            
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return '';
+            }
+            
+            const id = getCookie('userid');
+            const password = getCookie('password');
+            
+            if (!id || !password) {
+                alert('请先登录');
+                document.getElementById('login-form').classList.add('active');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('IDX', id);
+            formData.append('PIN', password);
+            formData.append('method', '修改头像');
+            formData.append('form', file);
+            
+            avatarEditSubmit.disabled = true;
+            avatarEditSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 上传中...';
+            
+            fetch('https://0911.fun/D/test/987/log_on.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(responseText => {
+                avatarEditSubmit.disabled = false;
+                avatarEditSubmit.innerHTML = '确认修改';
+                
+                if (responseText.includes('修改成功')) {
+                    alert('头像修改成功！');
+                    hideAvatarEditPanel();
+                    
+                    const savedUserData = localStorage.getItem('userData');
+                    if (savedUserData) {
+                        const userData = JSON.parse(savedUserData);
+                        const formMatch = responseText.match(/"form":(\d+)/);
+                        if (formMatch && formMatch[1]) {
+                            userData.avatar = "https://0911.fun/D/test/987/uploadt/" + formMatch[1] + ".jpg";
+                            localStorage.setItem('userData', JSON.stringify(userData));
+                            updateUserIcon(userData);
+                        }
+                    }
+                } else {
+                    alert(responseText || '头像修改失败');
+                }
+            })
+            .catch(error => {
+                avatarEditSubmit.disabled = false;
+                avatarEditSubmit.innerHTML = '确认修改';
+                console.error('头像修改错误:', error);
+                alert('头像修改过程中发生错误: ' + error.message);
+            });
+        });
+
+        // 资料编辑面板功能
+        const profileEditPanel = document.getElementById('profile-edit-panel');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        const saveProfileBtn = document.getElementById('save-profile-btn');
+
+        function showProfileEditPanel(userData) {
+            document.getElementById('edit-nickname').value = userData.name;
+            document.getElementById('edit-gender').value = userData.gender;
+            document.getElementById('edit-address').value = userData.address;
+            
+            // 从cookie获取当前密码并自动填充
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return '';
+            }
+            
+            const currentPassword = getCookie('password');
+            const currentPasswordInput = document.getElementById('edit-current-password');
+            currentPasswordInput.value = currentPassword || '';
+            currentPasswordInput.readOnly = true; // 设置为只读
+            
+            document.getElementById('edit-new-password').value = '';
+            
+            document.getElementById('avatar-overlay').classList.add('active');
+            document.getElementById('profile-edit-panel').classList.add('active');
+        }
+
+        function hideProfileEditPanel() {
+            document.getElementById('avatar-overlay').classList.remove('active');
+            document.getElementById('profile-edit-panel').classList.remove('active');
+        }
+
+        // 阻止编辑面板的点击事件冒泡
+        profileEditPanel.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        // 修改取消按钮的事件处理
+        cancelEditBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            hideProfileEditPanel();
+        });
+
+        saveProfileBtn.addEventListener('click', function() {
+            const nickname = document.getElementById('edit-nickname').value;
+            const gender = document.getElementById('edit-gender').value;
+            const address = document.getElementById('edit-address').value;
+            const currentPassword = document.getElementById('edit-current-password').value;
+            const newPassword = document.getElementById('edit-new-password').value;
+            
+            if (!nickname) {
+                alert('昵称不能为空');
+                return;
+            }
+            
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return '';
+            }
+            
+            const id = getCookie('userid');
+            
+            if (!id) {
+                alert('请先登录');
+                document.getElementById('login-form').classList.add('active');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('IDX', id);
+            formData.append('name', nickname);
+            formData.append('gender', gender);
+            formData.append('address', address);
+            formData.append('PINX', newPassword || currentPassword); // 如果没有新密码，使用当前密码
+            formData.append('PIN', currentPassword);
+            formData.append('method', '修改资料');
+            
+            const saveBtn = document.getElementById('save-profile-btn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 保存中...';
+            
+            fetch('https://0911.fun/D/test/987/log_on.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(responseText => {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '保存修改';
+                
+                if (responseText.includes('修改成功')) {
+                    alert('资料修改成功！');
+                    
+                    // 更新本地存储的用户数据
+                    const savedUserData = localStorage.getItem('userData');
+                    if (savedUserData) {
+                        const userData = JSON.parse(savedUserData);
+                        userData.name = nickname;
+                        userData.gender = gender;
+                        userData.address = address;
+                        
+                        // 如果修改了密码，更新cookie
+                        if (newPassword) {
+                            const expiryDate = new Date();
+                            expiryDate.setDate(expiryDate.getDate() + 7);
+                            document.cookie = `password=${newPassword}; expires=${expiryDate.toUTCString()}; path=/`;
+                            userData.password = newPassword;
+                        }
+                        
+                        localStorage.setItem('userData', JSON.stringify(userData));
+                        updateUserIcon(userData);
+                    }
+                    
+                    hideProfileEditPanel();
+                } else {
+                    alert(responseText || '资料修改失败');
+                }
+            })
+            .catch(error => {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '保存修改';
+                console.error('资料修改错误:', error);
+                alert('资料修改过程中发生错误: ' + error.message);
+            });
+        });
+
+        // 页面加载时检查登录状态
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedUserData = localStorage.getItem('userData');
+            if (savedUserData) {
+                updateUserIcon(JSON.parse(savedUserData));
+            }
+            
+            const cookies = document.cookie.split(';').reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split('=');
+                acc[key] = value;
+                return acc;
+            }, {});
+            
+            if (cookies.username && cookies.password) {
+                document.getElementById('login-username').value = cookies.username;
+                document.getElementById('login-password').value = cookies.password;
+            }
+            
+            loadFileList('v7');
+        });
+
+        // 上传功能实现
+        const uploadBtn = document.getElementById('upload-btn');
+        const uploadForm = document.getElementById('upload-form');
+        const fileUploadForm = document.getElementById('file-upload-form');
+        
+        uploadBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            uploadForm.classList.toggle('active');
+        });
+        
+        document.addEventListener('click', function() {
+            uploadForm.classList.remove('active');
+        });
+        
+        uploadForm.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+        
+        fileUploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const savedUserData = localStorage.getItem('userData');
+            if (!savedUserData) {
+                alert('请先登录后再上传文件');
+                document.getElementById('login-form').classList.add('active');
+                return;
+            }
+            
+            const userData = JSON.parse(savedUserData);
+            const fileInput = document.getElementById('file-upload');
+            const fileType = document.getElementById('file-type').value;
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('请选择要上传的文件');
+                return;
+            }
+            
+            if (!fileType) {
+                alert('请选择源码类型');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('ymaf1', file);
+            formData.append('type', fileType);
+            formData.append('AN', userData.username);
+            formData.append('PIN', userData.password);
+            
+            const submitBtn = document.getElementById('upload-submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 上传中...';
+            
+            fetch('https://0911.fun/D/test/ces/index.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(responseText => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-upload"></i> 上传文件';
+                
+                if (responseText.includes('上传成功了')) {
+                    alert('文件上传成功！');
+                    fileUploadForm.reset();
+                    uploadForm.classList.remove('active');
+                    const activeCategory = document.querySelector('.category.active');
+                    if (activeCategory) {
+                        loadFileList(activeCategory.dataset.type);
+                    }
+                } else {
+                    alert(responseText || '上传失败');
+                }
+            })
+            .catch(error => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-upload"></i> 上传文件';
+                console.error('上传错误:', error);
+                alert('上传过程中发生错误: ' + error.message);
+            });
+        });
+
+        // 分类点击事件
+        const categories = document.querySelectorAll('.category');
+        categories.forEach(category => {
+            category.addEventListener('click', function() {
+                categories.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                loadFileList(this.dataset.type);
+            });
+        });
+
+        // 搜索功能实现
+        const searchInput = document.getElementById('search-input');
+        let currentFiles = []; // 存储当前显示的文件列表
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.trim().toLowerCase();
+            filterFiles(searchTerm);
+        });
+        
+        function filterFiles(searchTerm) {
+            const fileCards = document.querySelectorAll('.file-card');
+            
+            if (searchTerm === '') {
+                // 如果搜索框为空，显示所有文件
+                fileCards.forEach(card => {
+                    card.style.display = 'flex';
+                });
+                return;
+            }
+            
+            fileCards.forEach(card => {
+                const fileName = card.querySelector('h3').textContent.toLowerCase();
+                if (fileName.includes(searchTerm)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // 加载文件列表
+        function loadFileList(type) {
+            const fileListContainer = document.getElementById('file-list');
+            
+            fileListContainer.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                </div>
+            `;
+            
+            const url = type === 'audit' 
+                ? 'http://0911.fun/D/test/ces/uploads/view.php?sort=id' 
+                : `http://0911.fun/D/test/ces/${type}/view.php`;
+            
+            fetch(url)
+                .then(response => response.text())
+                .then(responseText => {
+                    let files = parseFileData(responseText, type);
+                    
+                    // 修改排序逻辑：所有类型都按ID倒序排序
+                    if (type !== 'audit') {
+                        files.sort((a, b) => {
+                            const idA = parseInt(a.file) || 0;
+                            const idB = parseInt(b.file) || 0;
+                            return idB - idA;
+                        });
+                    } else {
+                        files.sort((a, b) => {
+                            const idA = a.id !== undefined ? a.id : 0;
+                            const idB = b.id !== undefined ? b.id : 0;
+                            return idB - idA;
+                        });
+                    }
+                    
+                    // 保存当前文件列表用于搜索过滤
+                    currentFiles = files;
+                    
+                    fileListContainer.innerHTML = '';
+                    
+                    if (files.length === 0) {
+                        fileListContainer.innerHTML = `
+                            <div style="grid-column:1/-1;text-align:center;padding:40px;color:#7f8c8d;">
+                                <i class="fas fa-folder-open" style="font-size:3rem;margin-bottom:15px;"></i>
+                                <p>当前分类没有文件</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    // 创建所有卡片
+                    files.forEach(file => {
+                        const card = document.createElement('div');
+                        card.className = 'file-card';
+                        card.innerHTML = `
+                            <div class="file-icon">
+                                ${type !== 'audit' ? `<span class="file-id-badge">${file.file}</span>` : `<span class="file-id-badge">${file.id}</span>`}
+                                <img src="${type === 'audit' ? `http://0911.fun/D/test/ces/uploads/res/${file.file}.png` : `http://0911.fun/D/test/ces/${file.type}/res/${file.file}.png`}" 
+                                     alt="${file.name}" 
+                                     onerror="this.src='https://cdn-icons-png.flaticon.com/512/1216/1216733.png'">
+                            </div>
+                            <div class="file-info">
+                                <h3>${file.name}</h3>
+                                <p>发布者: <span class="author-name" data-user-id="${file.userId}">加载中...</span></p>
+                            </div>
+                            ${type === 'audit' ? `
+                            <div class="audit-buttons">
+                                <button class="audit-download-btn" data-url="https://0911.fun/D/test/ces/uploads/${file.file}.iApp">
+                                    <i class="fas fa-download"></i> 下载
+                                </button>
+                                <div class="audit-btn-group">
+                                    <button class="approve-btn" data-id="${file.id}">
+                                        <i class="fas fa-check"></i> 通过
+                                    </button>
+                                    <button class="reject-btn" data-id="${file.id}">
+                                        <i class="fas fa-times"></i> 拒绝
+                                    </button>
+                                </div>
+                            </div>
+                            ` : `
+                            <div class="file-actions">
+                                <button class="download-btn" data-url="https://0911.fun/D/test/ces/${file.type}/${file.file}.iApp">
+                                    <i class="fas fa-download"></i> 下载
+                                </button>
+                            </div>
+                            `}
+                        `;
+                        
+                        fileListContainer.appendChild(card);
+                        
+                        // 为每个文件单独获取发布者名称
+                        updateAuthorName(file.userId);
+                        
+                        // 添加下载按钮事件
+                        const downloadBtn = card.querySelector('.download-btn, .audit-download-btn');
+                        if (downloadBtn) {
+                            downloadBtn.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                window.open(this.dataset.url, '_blank');
+                            });
+                        }
+                        
+                        // 如果是审核类型，添加审核按钮事件
+                        if (type === 'audit') {
+                            const approveBtn = card.querySelector('.approve-btn');
+                            const rejectBtn = card.querySelector('.reject-btn');
+                            
+                            function getCookie(name) {
+                                const value = `; ${document.cookie}`;
+                                const parts = value.split(`; ${name}=`);
+                                if (parts.length === 2) return parts.pop().split(';').shift();
+                                return '';
+                            }
+                            
+                            const username = getCookie('username');
+                            const password = getCookie('password');
+                            
+                            approveBtn.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                const id = this.dataset.id;
+                                
+                                if (!username || !password) {
+                                    alert('请先登录');
+                                    document.getElementById('login-form').classList.add('active');
+                                    return;
+                                }
+                                
+                                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 处理中';
+                                this.disabled = true;
+                                
+                                fetch(`https://0911.fun/D/test/ces/sh.php?ID=${id}&AN=${username}&PIN=${password}&Result=通过`, {
+                                    method: 'GET'
+                                })
+                                .then(response => response.text())
+                                .then(responseText => {
+                                    alert(responseText);
+                                    loadFileList('audit');
+                                })
+                                .catch(error => {
+                                    console.error('审核通过错误:', error);
+                                    alert('审核过程中发生错误: ' + error.message);
+                                })
+                                .finally(() => {
+                                    this.innerHTML = '<i class="fas fa-check"></i> 通过';
+                                    this.disabled = false;
+                                });
+                            });
+                            
+                            rejectBtn.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                const id = this.dataset.id;
+                                
+                                if (!username || !password) {
+                                    alert('请先登录');
+                                    document.getElementById('login-form').classList.add('active');
+                                    return;
+                                }
+                                
+                                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 处理中';
+                                this.disabled = true;
+                                
+                                fetch(`https://0911.fun/D/test/ces/sh.php?ID=${id}&AN=${username}&PIN=${password}&Result=不通过`, {
+                                    method: 'GET'
+                                })
+                                .then(response => response.text())
+                                .then(responseText => {
+                                    alert(responseText);
+                                    loadFileList('audit');
+                                })
+                                .catch(error => {
+                                    console.error('审核不通过错误:', error);
+                                    alert('审核过程中发生错误: ' + error.message);
+                                })
+                                .finally(() => {
+                                    this.innerHTML = '<i class="fas fa-times"></i> 拒绝';
+                                    this.disabled = false;
+                                });
+                            });
+                        }
+                    });
+                    
+                    // 加载完成后，如果搜索框有内容，则应用过滤
+                    if (searchInput.value.trim() !== '') {
+                        filterFiles(searchInput.value.trim().toLowerCase());
+                    }
+                })
+                .catch(error => {
+                    console.error('获取文件列表失败:', error);
+                    fileListContainer.innerHTML = `
+                        <div style="grid-column:1/-1;text-align:center;padding:40px;color:#e74c3c;">
+                            <i class="fas fa-exclamation-triangle" style="font-size:3rem;margin-bottom:15px;"></i>
+                            <p>加载文件列表失败，请稍后重试</p>
+                        </div>
+                    `;
+                });
+        }
+
+        // 单独更新发布者名称
+        function updateAuthorName(userId) {
+            // 获取所有需要更新这个userId的发布者名称元素
+            const authorSpans = document.querySelectorAll(`.author-name[data-user-id="${userId}"]`);
+            
+            // 如果已经处理过这个userId，直接返回
+            if (authorSpans.length === 0 || authorSpans[0].textContent !== '加载中...') {
+                return;
+            }
+            
+            fetchAuthorName(userId)
+                .then(name => {
+                    authorSpans.forEach(span => {
+                        span.textContent = name;
+                    });
+                })
+                .catch(error => {
+                    console.error(`获取发布者名称失败 (ID: ${userId}):`, error);
+                    authorSpans.forEach(span => {
+                        span.textContent = '未知发布者';
+                    });
+                });
+        }
+
+        // 获取发布者名称
+        function fetchAuthorName(userId) {
+            return new Promise((resolve, reject) => {
+                // 处理空userId的情况
+                if (userId === undefined || userId === null || userId === '') {
+                    resolve('未知发布者');
+                    return;
+                }
+                
+                // 即使是0也正常请求
+                fetch(`https://0911.fun/D/test/987/name.php?ID=${userId}`, {
+                    method: 'GET'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('请求失败，状态码: ' + response.status);
+                    }
+                    return response.text();
+                })
+                .then(name => {
+                    // 处理可能的空响应
+                    if (!name || name.trim() === '') {
+                        resolve('未知发布者');
+                    } else {
+                        resolve(name.trim());
+                    }
+                })
+                .catch(error => {
+                    console.error('获取发布者名称错误:', error);
+                    reject(error);
+                });
+            });
+        }
+
+        // 解析文件数据
+        function parseFileData(data, type) {
+            if (!data || data.trim() === '') return [];
+            
+            const records = data.split('#');
+            const files = [];
+            
+            records.forEach(record => {
+                if (!record.trim()) return;
+                
+                const userIdMatch = record.match(/ANID:([^,]+)/);
+                const nameMatch = record.match(/name:([^,]+)/);
+                const fileMatch = record.match(/File:([^,]+)/);
+                const typeMatch = record.match(/type:([^,]+)/);
+                let idMatch;
+                
+                if (type === 'audit') {
+                    idMatch = record.match(/ID:([^,]+)/);
+                }
+                
+                if (userIdMatch && nameMatch && fileMatch && typeMatch) {
+                    const displayName = type === 'audit' ? `[${typeMatch[1]}] ${nameMatch[1]}` : nameMatch[1];
+                    
+                    const fileData = {
+                        userId: userIdMatch[1],
+                        name: displayName,
+                        file: fileMatch[1],
+                        type: typeMatch[1]
+                    };
+                    
+                    if (type === 'audit') {
+                        fileData.id = idMatch ? parseInt(idMatch[1]) : 0;
+                    }
+                    
+                    files.push(fileData);
+                }
+            });
+            
+            return files;
+        }
+    </script>
+</body>
+</html>

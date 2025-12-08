@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>地名搜索站</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    #header {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #f8f8f8;
+    }
+    #logo {
+      width: 50px; /* 根据实际logo大小调整 */
+      height: auto;
+      margin-right: 10px;
+    }
+    #searchContainer {
+      margin: 20px;
+    }
+    #searchInput {
+      width: 300px;
+      padding: 5px;
+      font-size: 16px;
+    }
+    #results {
+      margin-top: 10px;
+    }
+    .resultItem {
+      margin: 5px 0;
+      padding: 5px;
+      border: 1px solid #ddd;
+      cursor: pointer;
+    }
+    .highlight {
+      color: red;
+    }
+    /* 弹出悬浮窗样式 */
+    #popup {
+      display: none;
+      position: fixed;
+      bottom: 20px; /* 距离底部20px */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      max-width: 400px;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 20px;
+      box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2); /* 阴影向上 */
+      z-index: 1000;
+    }
+    #popupClose {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="header">
+    <img id="logo" src="images/logo.png" alt="Logo">
+    <h1 id="title" onclick="showPopup()">地名搜索站</h1>
+  </div>
+
+  <div id="searchContainer">
+    <input type="text" id="searchInput" placeholder="输入地名搜索..." onkeyup="filterResults()">
+    <div id="results">
+      <!-- 搜索结果将在这里显示 -->
+    </div>
+  </div>
+
+  <!-- 弹出悬浮窗 -->
+  <div id="popup">
+    <span id="popupClose" onclick="hidePopup()">×</span>
+    <p>开发说明：</p>
+    <p>这是一个地名搜索站，支持苗文和汉字互搜。搜索框内容不区分大小写，搜索结果会高亮显示匹配内容。当搜索框为空时，页面会恢复到初始化状态，显示前10个地名。</p>
+    <p>开发作者：@苗族阿松（重庆）</p>
+    <p>数据来源：@苗疆行纪（贵州）<p>
+  </div>
+
+  <script>
+    // 地名数据
+    const placeNames = [
+      "Dlib Jangl  西江",
+"Nangl Deik  朗德",
+"Zangx Xongx  丹江",
+"Vangl Yat  望丰",
+"Fangs Gif  方祥",
+"Zab Dob  大塘",
+"Dol Jenb  桃江",
+"Eb Hluk  永乐",
+"Dliak Dik  达地",
+
+"eb hsaik  乌杀",
+"eb ghob  乌高",
+"bil ghob  白高",
+"maf liod  麻料",
+"ghongd bat  控拜",
+"vangl diel  堡子",
+"ghangb diuk  开觉",
+
+"eb niangx  乌仰",
+"ghab niux eb  两岔河",
+"zangx ghax  掌卡",
+"ghangb vongl  干荣",
+"vangl bil  羊排",
+"diongb yenx  东引",
+"nangl gheit  南贵",
+"vangx tongd  也通",
+
+"bil wus  营上",
+"nangl lax  连城",
+"ghangb gix  根更",
+"bil bis  白碧",
+"ghax leif  敢雷",
+"jes dlub  白坡",
+"nangl hlod  南少",
+"eb vil nangl  猫鼻岭",
+"eb vil diel  白健",
+"bil yel  白尧",
+"yaob yenf  腰营",
+"eb vil jes  龙塘",
+"bil lix  白里",
+
+"nangl yel  南尧",
+"vangl wul  羊吾",
+"eb baid  乌摆",
+"fangs lix  黄里",
+"eb yel  乌尧",
+"diongb zangb  平寨",
+"eb hek  小龙坳",
+"dlongs hlod  大龙坳",
+"vangl ghot  老寨",
+"jes yel  脚尧",
+
+"vangx gheid  也改",
+"dangx tongd  打统",
+"eb liul  乌流",
+"ghangb nangl yux  干南有",
+"bil hob  排夫",
+"vangx lix jit  岩寨",
+"nangl deik vangl jes  朗德上寨",
+"ghongd bat  控拜",
+"vangl dab  报德平寨",
+"bok das  报德",
+"bil gud  排苟",
+"ghab wus  皆吾",
+"zangx hsenb  掌生",
+"vangx lit  也利",
+"eb xob  乌肖",
+"dangx guk hnaib  党谷花",
+"eb xob vangl jes  羊脚",
+"wb wax  乌瓦",
+"eb jil mil  乌吉明",
+"bok dis  报滴",
+"nangl mongx  南猛",
+"vangx liux  羊柳",
+"nangl bil  高寨",
+"nangl yek  平寨",
+"vangx diongb  也东",
+"bil dangb nangx  新寨",
+"vangx vob nix  韭寨",
+"vangx xed  老猫",
+"vangx gongb  也公",
+
+"nangl wab  丰塘",
+"vangx gheid  丛木",
+"zangx leib  石板",
+"ghangb yif  甘益",
+"zangx yel  青杠",
+"dlongs ninl  公统",
+"bil hfud  排虎",
+"dlongs jex  松九",
+"eb zeit  乌这",
+"eb dlangl  乌常",
+"vangl ghot  羊告",
+"bil xob  排肖",
+"eb vib dlab  背后山",
+"zangx ongd  丫口寨",
+"lix bib jil  三角田",
+"vangl dab  中寨",
+"bil ful  排福",
+"eb nongx ghab diongl  大冲",
+"eb hxangd  乌响",
+"jes wil  脚云",
+"nangl wil  南云",
+"vangl hvib  新堡",
+"ghab gif eb bal  干河沟",
+"xangl mol  大田边",
+"vangx khab  也开",
+"eb deik  乌迭",
+"vangl kad  羊卡",
+"ghangb jongt  干谁",
+"vangl hvib  新寨",
+"eb juk  乌局",
+"nangl hxangd  南响",
+"bil ghad lax  排卡览",
+"zangx vob diuk  掌窝",
+"vangl fangs  荣房",
+"vangx nis  也宜",
+"eb hxangb  乌江",
+"nangl khab  南开",
+"zangx vangl bil  掌羊排",
+"eb jil  乌节",
+"dlongs gangt  满天星",
+"vangx yif  也益",
+"ghax wub  改乌",
+"vangx bis  也笔",
+"zangx diab  掌丹",
+"eb diab  乌的",
+"zangx denf  怎屯",
+
+"vangx vil  老丹江",
+"eb hfab  教场",
+"wangl bat  东山屏",
+"zangx bangb  桃子寨",
+"jes mongx  脚猛",
+"zangx ghad liod  南屏",
+"bil ghab jib  杉木冲",
+"khut lux  固鲁",
+"dliuk vuf  小固鲁",
+"eb xed  猫猫河",
+"jes xongl  脚猛",
+"zangx xongl  者雄",
+"xangx lul  响楼",
+"ghab wangx vob  犀牛塘",
+"hfud jad dangd  小郎当",
+"nangl dangd  大郎当",
+"gox mais  果梅",
+"hfud vangl  虎羊",
+"ghangb nangl zangl  干南则",
+"vangl yat  治安",
+"dol yel  陶尧",
+"dlongs seid  雄水",
+"dol yel bil ghax  陶尧排卡",
+"vangl gud  羊苟",
+"zangt hlieb  白岩",
+"ghangb lil  干力",
+"eb diongb  乌东",
+"bil sob  排烧",
+"eb hxut vangl yut  小乌秀",
+"eb hxut vangl hlieb  大乌秀",
+"vangl vib  岩寨",
+"vangl bil  羊排",
+"dangx ghob  党高",
+"jes dlab  桥散",
+"zangx bil  掌排",
+"zangx ghaib  长丰",
+"eb khab  乌开",
+"ghab dlongs  鸡勇",
+"vangl eb  水寨",
+"vangl diongb  中寨",
+"bil ghax  排卡",
+"wub yad  乌亚",
+"eb bat  乌坝",
+"bil ongt  排翁",
+"nangl ongt  南翁",
+"bil khab  排开",
+
+"wangs yif  汪一",
+"vangx hob  养蒿",
+"jes hlangt  交浪",
+"dlib ghaf  基甲",
+"vangx ghaf  养甲",
+"zangx pab  泡木",
+"fangs xed vangl nangl  待忙",
+"vangx ghaid  松木寨",
+"fangs xed vangl jes  方召大寨",
+"ongb ghab lix  黄茅",
+"vangx ongd juk  覃膏堡",
+"zangx saof  掌苕",
+"jes wangs vangl bil  交汪上寨",
+"jes wangs vangl dab  交汪下寨",
+"hfud dal jes  李子",
+"ongb diuk nangl  巫脚南",
+"ongb diuk jes  巫脚交",
+"dlongs pab  松葩",
+"fangs bil  反排",
+"ongb dlub  巫梭",
+"xit dais  四登",
+
+"ongb hsengb  翁生",
+"dlas vangg nangl  下桃赖",
+"dlas vangl ongb  中桃赖",
+"ghab znagx vangl diel  上桃赖",
+"ongd xed nangl  翁秀南",
+"ongd xed jes  翁秀交",
+"yof vangl  桃尧",
+"vangl gongd  梅影",
+"nangx denx  郎等",
+"nangl niongl  南浓",
+"zangx niongl  丈浓",
+"vangl wangs  阳汪",
+"dangx ghongd  台拱寨",
+"zangx xed  猫猫坪",
+"nangl hxit  南市",
+"ghab wul xongx  台雄",
+"bil dad  白大",
+"vangx ninx  养你",
+"hxut liux  秀柳",
+"zangx zod  掌坐",
+"ongb hsaib bil  翁腮白",
+"jes hxangd  红阳",
+"ghab vongl hxangd  小红寨",
+"jes pit  交片",
+"ongb ghaib  翁归",
+"ghab mangx  登鲁小寨",
+"denb lux  登鲁",
+"bil dliak  白下",
+"zangx dliak  掌下",
+"ongb dongx hfut  翁董付",
+"jes mongt  交孟",
+
+"nangl hxek  南哨",
+"tent ghaox  屯稿",
+"hsait hxenb  四新",
+"vangl dad  旧州",
+"jes jangd  九匠",
+"zangx mais hsenb  棉花坪",
+"niangx hfangf  仰方",
+"khangd langf  良田",
+"ongb pot  黄泡",
+"jenx hsaod  景孝",
+"jenx tent  景屯",
+"dlongs vib jel  碓窝寨",
+"dlongl vob naox  杨家沟",
+"nangl gangt  八埂",
+"liux sas  柏梓坪",
+"liux diangx  芳寨",
+"zangx xangx  施洞",
+"dangx vongx  塘龙",
+"vangl dliab  偏寨",
+"zangx yangl  平洋",
+"zangx nenl  小河",
+"nangl hvab  巴拉河",
+"bil xed  猫坡",
+"vangl ghet lux  阳故鲁",
+"zok mas  芝麻寨",
+"nangl xos  平兆",
+"zangx hmangd  猫鼻岭",
+"vib diel  景洞坳",
+"fangb dlangd  景洞塘",
+
+"dol xangb  桃香",
+"dif qit  迪气",
+"vangl eb  水寨",
+"vangl dlongs  中寨",
+"bil dliul  陡寨",
+"eb mangb  乌忙",
+"jes nox  雀鸟",
+"ghab diub  格头",
+"jes bis  毛坪",
+"jes fangs  脚仿",
+
+"nangl hsat  南社",
+"ghab wul wais  皆屋渊",
+"ongb khab  翁开",
+"ongb wax  翁瓦",
+"ongb hsad  翁社",
+"khat dlias  岩寨",
+"zangx lix  掌里",
+"dlongs ghab vax  松皆雅",
+"zangx hlieb  平寨",
+"zangx ghaib  掌皆",
+"bil zas  白扎",
+"dlongs ongb  松瓮",
+"zangx xix  掌喜",
+"nangl hsaib  白水洞",
+"zangx dex  大塘",
+"diub tenf  屯上",
+"vangl lul  台乐",
+"khat vangs  排羊寨",
+"jex baix  九摆",
+"bil hsab  白基杉",
+"nangl daob vangl nangl  南刀下寨",
+"nangl daob vangl jes  南刀上寨",
+
+"nangl nix  南你",
+"ghab hob  皆蒿",
+"vangb dlib  阳西",
+"zangx bangb  岑邦",
+"ongb nongl  翁农",
+"jes diangk  交匠",
+"nangl diangk  南匠",
+"zangx dangs  岩寨",
+"ghad hsenk  挂胜",
+"bok xud  报效",
+"ghab wab  皆洼",
+"zangx fangx  掌访",
+"zangx vob lax  掌窝那",
+"diongl bad dliak  同巴下",
+"vangl ghet laob  阳故捞",
+"ghab hxax  格色",
+"ghab wangx bod ted  白土",
+"wangs hfud  望虎屯",
+"ghab dlongx  榕山",
+"dlib zat  岩脚",
+"ghab tent  老屯",
+"gangd niangd  稿仰",
+"zangx tangb  长滩",
+"vangx sob  养梭",
+"zangx bis  掌璧",
+"hfud vongl  富荣",
+"jes xangx  坝场",
+"vangl tent  阳屯",
+"bil liuf  排略",
+"bok ghaox  播稿",
+"dlib get  鸡蛋寨",
+"ongb ghongb  翁工",
+"ongb xangt  翁向",
+
+"jes ghongd  交宫",
+"vangx khaib vangl hvib  黑山寨",
+"zangx hxenb  掌新",
+"jit dos  记多",
+"wangs jangs  汪江",
+"dangx daot  党道",
+"vangx hvat  养下",
+"vangl diaf  养甲",
+"bil bangb  白帮",
+"dlongs ghuab saf  松挂刹",
+"zangx hlaod  岩板",
+"ongb dliab  翁渊",
+"ongb mangl  巫芒",
+"zangx ghaib  松照",
+"jes hvat  交下",
+"zangx hongb  掌丰",
+"ongb diel  翁丢",
+"dlongs ghab wik  松皆玉",
+"nangl ghongd  南宫",
+"zangx mif  大田角",
+"zangx ghab ghaib  掌皆归",
+"zangx bis  掌必",
+"ongb hvib  翁细",
+"ongb hseib  翁虽",
+"dlongs gangf  东扛",
+"vob dluk dab  皆就西",
+"dlongs nins  东衣",
+"zangx jit  掌吉",
+"vangx gob  养戈",
+"dlongs laox  松老",
+"ongb zangx wus  掌阿",
+"haod langf  蒿郎",
+"ongb niel  翁牛",
+"ghab lik  皆利",
+"jes naf  交纳",
+"zangx bud  掌包",
+"jes bud  交包",
+"nangl niel  南牛",
+"ongb jangf  翁匠",
+"ongb mif  巫密",
+"ongb vib haib  石灰河",
+"jes mif  交密",
+"vangl zat  阳这",
+"bil bangb  白邦",
+
+"jud sib  旧司",
+"hek hsaok  后哨",
+"hek hsaok vangl bil  后哨上寨",
+"diongb tent  革一屯上",
+"ghab yif  革一大寨",
+"ghab zangx lix  田坝",
+"dlongs ghad  梨树坳",
+"bil hxenb vangx khab  青杠寨",
+"bil hxenb  排生",
+"deix hxenb  台水",
+"vangx dlix  养洗",
+"ghab ongd  太平坳",
+"bil hlaot  革一新寨",
+"ongb xenx  翁醒",
+"vangl dos  洋桃",
+"zat dangb  乍当",
+"ongb zok vangl hlieb  江边",
+"jil nangx lix  小黑寨",
+"fangb nangx  冷溪",
+"bil fangs  白方",
+"dlib nangl  西南",
+"dlongs lix bod  松里播",
+"dlib zongd  桃树塝",
+"las des  豆寨",
+"zangx mais hsenb  棉花坪",
+"wangs fib  汪辉",
+"vangx dliangx  高大山",
+"dlongs bangb  沙邦",
+"las hlieb  茅坪",
+"zangx did  平贾",
+
+"bil yol  白岳",
+"ghab liaf bax  皆牙把",
+"zangx vox  掌我",
+"ongb yol  五寨",
+"zangx vib vangl hlieb  大岩寨",
+"zangx vib vangl yut  小岩寨",
+"nangl dongb  南冬",
+"nangl hlaod  南套",
+"ongb hlaod  长中",
+"zangx hlaod  水井",
+"dlongs dangd  松旦",
+"dlongs laox  南省",
+"bil wangs  白汪",
+"jes ninx  交碾",
+"ongb gangb  翁岗",
+"nangl xongx  南兄",
+"zangx ful  展福",
+"zangx dongx  掌董",
+"bok ent  播恩",
+"dangl xangb  桃香",
+"ghab zangx ninx  方省",
+"bil langs  白朗",
+"dax gil  大德",
+"ghab wul daob yinb  打革坝",
+"ghab nangl gal  石板桥",
+
+"ongb hniangb  清水江",
+"ongb hvab  巴拉河",
+"ongb nix  翁你河",
+"ongb mif  巫密河",
+"vangx jit  养机坡",
+"vangx bok tait  养播太",
+"bok khad hfud  播开吼",
+"vangx niangx  养仰山",
+"ongb gangb bil  翁岗白",
+"bok zangx dliak  播掌下",
+"bil mok  白么坡",
+"ongb ghaib  翁该坡",
+"vangx nix  养你山",
+"bok vangx niongl  播养浓",
+"bok jes pik  交片山",
+"dlongs diongx nongl  仓门坳",
+"bil jut  白就山",
+"bil hxeb hnaib  白秀那",
+"vangx ghab hongl  养嘎宏",
+
+"ghab diongl bil  皆同白",
+"bok zangx xix  播展喜",
+"bil ghab hsaib  白皆腮",
+"bok vangx wax  播养瓦",
+"ongb bangx jib  翁板鸡",
+"bok ghox  播果",
+"vangx enb mal  养恩马",
+"bok ghab hob  喊天坡",
+"bok ngaf diongl  大安东",
+"bok jex lux  播九鲁",
+"bok vangl nangl  播阳南",
+"vangx enb mal  马鞍山",
+"bil xed  猫坡",
+"bok zangx hmangd  猫鼻岭",
+"bok dex niel  铜牛山",
+"zangx niongx  掌陇坡",
+"bok dlas nins  播沙碾",
+"vangx mongd  养茂坡",
+"bok jok hsenb  播九生",
+"bok ful  播福",
+
+"ongb ghab mangx  翁皆满",
+"bok naix hxit  播乃谢",
+"bil ghob dus nis  白果斗利",
+"bok jes saix  播交晒",
+"bok zangx hlieb  播长溜",
+"bok ghet wuf  播固吾",
+"bok dlaib  黑山",
+"bok vangx hongb  播养轰",
+"dlongs jex lix  松九里坡",
+"vangx dliak  养下坡",
+"dlongs hvet  松亥坡",
+"jes hxit  交系坡",
+"bok vangx dangk  播养当",
+"zangx vob diuk  掌阿就",
+"bok vangx hxuk  播养秀",
+"zangx saix  掌水平坡",
+"bok nangl daob  播南刀",
+
+"Ghab Yenf   革一",
+"Zangx Jek  台盘",
+
+"Kad Linx  凯里",
+"Nangl Khat  岑巩",
+"Hxent Ninl  镇远",
+"Gix Xix  天柱",
+"Fangb Nix  台江",
+"Qib Jux  施秉",
+"Bad Jongb  三穗",
+"Fangb Hxib  榕江",
+"Mab Hab  麻江",
+"Lix Bix  黎平",
+"Zangx Xongx  雷山",
+"Xangx Wangx  锦屏",
+"Gud Ngul  剑河",
+"Hxib Liongb  黄平",
+"Yaf Vangl  丹寨",
+"Gud Meil  从江",
+"Vangx Hmub  苗岭",
+"Fangb Hob  雷公山",
+"Dlib Jangl  西江千户苗寨",
+"Bob Bil Jul  香炉山",
+"Diongb Wil  都匀",
+"Bib Jil  三都",
+"Zangx Wangx  福泉",
+"Pik Nax  余庆",
+"Ghab Yens  融水",
+"Gud Nif  三江",
+"Ghab Hangl  融安",
+"Yis Vut  安顺",
+"Yis Dins  镇宁",
+"Vangx Qib  关岭",
+"Yis Fangx  兴义",
+"Yis Hvib  兴仁",
+"Xangx Jeb  贞丰",
+"Diub Xed  安龙",
+    ];
+
+    // 初始化显示前10个地名
+    function displayInitialPlaces() {
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "";
+      placeNames.slice(0, 10).forEach(place => {
+        const div = document.createElement("div");
+        div.className = "resultItem";
+        div.textContent = place;
+        resultsDiv.appendChild(div);
+      });
+    }
+
+    // 搜索框过滤功能
+    function filterResults() {
+      const input = document.getElementById("searchInput");
+      const filter = input.value.toLowerCase();
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "";
+
+      if (filter.trim() === "") {
+        displayInitialPlaces(); // 如果搜索框为空，显示前10个地名
+        return;
+      }
+
+      placeNames.forEach(place => {
+        if (place.toLowerCase().includes(filter)) {
+          const div = document.createElement("div");
+          div.className = "resultItem";
+          div.innerHTML = highlightText(place, filter);
+          resultsDiv.appendChild(div);
+        }
+      });
+    }
+
+    // 高亮显示匹配文本（不区分大小写）
+    function highlightText(text, keyword) {
+      const regex = new RegExp(keyword, "gi"); // 不区分大小写的正则表达式
+      return text.replace(regex, `<span class="highlight">$&</span>`); // 使用$&表示匹配的文本
+    }
+
+    // 显示弹出悬浮窗
+    function showPopup() {
+      document.getElementById("popup").style.display = "block";
+    }
+
+    // 隐藏弹出悬浮窗
+    function hidePopup() {
+      document.getElementById("popup").style.display = "none";
+    }
+
+    // 页面加载时显示前10个地名
+    window.onload = displayInitialPlaces;
+  </script>
+</body>
+</html>
